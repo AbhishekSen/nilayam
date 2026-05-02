@@ -1,0 +1,41 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  height: 100%;
+  width: 100%;
+}
+
+.loading-overlay,
+.error-overlay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  font-family: system-ui, -apple-system, sans-serif;
+  color: #333;
+}
+
+.error-overlay {
+  color: #c0392b;
+}
+
+.error-overlay button {
+  margin-top: 16px;
+  padding: 8px 20px;
+  font-size: 14px;
+  border: 1px solid #c0392b;
+  background: white;
+  color: #c0392b;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.error-overlay button:hover {
+  background: #c0392b;
+  color: white;
+}

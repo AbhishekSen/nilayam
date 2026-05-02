@@ -32,3 +32,10 @@ output.csv
 
 # macOS
 .DS_Store
+
+# Node / map-app
+map-app/node_modules/
+map-app/dist/
+map-app/dist-ssr/
+*.log
+*.local
