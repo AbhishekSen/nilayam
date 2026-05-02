@@ -2,17 +2,15 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import os
 
-st.set_page_config(page_title="Propsoch Price vs Market", layout="wide")
+from app import load_data
+
 st.title("Price vs Market Dashboard")
 st.caption("Price per sqft of each project vs its micromarket average")
 
 # --- Load data ---
-csv_path = os.path.join(os.path.dirname(__file__), "..", "output.csv")
-df = pd.read_csv(csv_path)
+df = load_data()
 
-df["price_per_sqft"] = df["minPrice"] / df["minSaleableArea"]
 df["vs_market_pct"] = ((df["price_per_sqft"] - df["micromarketPriceAverage"]) / df["micromarketPriceAverage"] * 100).round(1)
 df["bubble_size"] = df["popularity"].map({"A": 22, "Z": 10}).fillna(10)
 

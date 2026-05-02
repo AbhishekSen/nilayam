@@ -43,12 +43,19 @@ Edit the `params` dict at the top of `main.py` to change what gets fetched:
 
 ## Analytics Dashboards
 
-Streamlit apps that read `output.csv` for visual analysis:
+A consolidated multipage Streamlit app that reads `output.csv` for visual analysis:
 
 ```bash
-uv run streamlit run analytics/dashboard.py      # Price-per-sqft vs micromarket average
-uv run streamlit run analytics/undervalued.py     # Opportunity scoring & discount analysis
+uv run streamlit run analytics/app.py
 ```
+
+Pages:
+
+| Page | Description |
+|---|---|
+| Price vs Market | Price-per-sqft vs micromarket average scatter |
+| Undervalued | Opportunity scoring & discount analysis |
+| Amenity Premium | Statistical analysis of amenity price premiums |
 
 ## Interactive Property Map
 

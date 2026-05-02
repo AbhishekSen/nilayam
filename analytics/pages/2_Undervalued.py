@@ -2,17 +2,15 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-import os
 
-st.set_page_config(page_title="Undervalued Project Detector", layout="wide")
+from app import load_data
+
 st.title("Undervalued Project Detector")
 st.caption("Projects priced below their micromarket average, weighted by quality signals")
 
 # --- Load & prepare data ---
-csv_path = os.path.join(os.path.dirname(__file__), "..", "output.csv")
-df = pd.read_csv(csv_path)
+df = load_data()
 
-df["price_per_sqft"] = df["minPrice"] / df["minSaleableArea"]
 df["discount_pct"] = (
     (df["micromarketPriceAverage"] - df["price_per_sqft"])
     / df["micromarketPriceAverage"] * 100
