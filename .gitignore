@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environment (uv creates this in project root)
+.venv
+bin/
+lib/
+lib64/
+include/
+pyvenv.cfg
+.python-version
+
+# uv
+.uv/
+
+# Output data
+output.csv
+
+# Environment variables
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
