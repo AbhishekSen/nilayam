@@ -4,6 +4,14 @@ import os
 import time
 import tempfile
 import shutil
+from dotenv import load_dotenv
+from supabase import create_client
+
+load_dotenv()
+
+supabase_url = os.environ.get("SUPABASE_URL")
+supabase_key = os.environ.get("SUPABASE_SERVICE_ROLE_KEY", os.environ.get("SUPABASE_ANON_KEY"))
+supabase = create_client(supabase_url, supabase_key) if supabase_url and supabase_key else None
 
 # API configuration
 base_url = "https://api.propsoch.com/be/v2/api/project/getProjects"
@@ -145,3 +153,15 @@ except Exception as e:
 print(f"\nData successfully saved to {csv_file}")
 print(f"Total unique projects in CSV: {len(df_combined)}")
 print(f"Columns: {', '.join(df_combined.columns.tolist())}")
+
+# Upsert to Supabase
+if supabase:
+    try:
+        records = df_combined.where(df_combined.notna(), None).to_dict(orient="records")
+        supabase.table("projects_blr").upsert(records, on_conflict="id").execute()
+        print(f"Upserted {len(records)} rows to Supabase")
+    except Exception as e:
+        print(f"Warning: Supabase upsert failed: {e}")
+        print("CSV was written successfully — data is not lost")
+else:
+    print("Supabase not configured — skipping upsert")

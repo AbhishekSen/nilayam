@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-import Papa from 'papaparse';
+import { supabase } from '../lib/supabase';
 import { validateCoordinates } from '../utils/validation';
 
-export function useProperties(csvUrl = '/data/properties.csv') {
+export function useProperties() {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -10,23 +10,14 @@ export function useProperties(csvUrl = '/data/properties.csv') {
   useEffect(() => {
     let cancelled = false;
 
-    async function fetchAndParse() {
+    async function fetchProperties() {
       try {
-        const response = await fetch(csvUrl);
-        if (!response.ok) {
-          throw new Error(`Failed to fetch CSV: ${response.status} ${response.statusText}`);
-        }
-        const text = await response.text();
+        const { data: rows, error: sbError } = await supabase
+          .from('projects_blr')
+          .select('*');
 
-        const { data: rows, errors } = Papa.parse(text, {
-          header: true,
-          skipEmptyLines: true,
-          dynamicTyping: true,
-          transformHeader: (h) => h.trim(),
-        });
-
-        if (errors.length > 0) {
-          console.warn('CSV parse warnings:', errors);
+        if (sbError) {
+          throw new Error(`Supabase query failed: ${sbError.message}`);
         }
 
         const validated = rows
@@ -45,9 +36,9 @@ export function useProperties(csvUrl = '/data/properties.csv') {
       }
     }
 
-    fetchAndParse();
+    fetchProperties();
     return () => { cancelled = true; };
-  }, [csvUrl]);
+  }, []);
 
   return { data, loading, error };
 }

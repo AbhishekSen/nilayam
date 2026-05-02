@@ -10,7 +10,7 @@ export default function MapView({ properties }) {
     <MapContainer
       center={DEFAULT_CENTER}
       zoom={DEFAULT_ZOOM}
-      style={{ height: '100vh', width: '100%' }}
+      style={{ height: '100%', width: '100%' }}
       scrollWheelZoom={true}
     >
       <TileLayer
