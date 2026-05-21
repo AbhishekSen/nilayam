@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown';
 import type { ChatMessage as ChatMessageType } from '../hooks/useChat';
 
 type Props = { message: ChatMessageType };
@@ -30,9 +31,9 @@ export default function ChatMessage({ message }: Props) {
               <code>{seg.text}</code>
             </pre>
           ) : (
-            <p key={i} className="chat-text">
-              {seg.text}
-            </p>
+            <div key={i} className="chat-text">
+              <ReactMarkdown>{seg.text}</ReactMarkdown>
+            </div>
           ),
         )}
         {message.streaming && !message.text && (

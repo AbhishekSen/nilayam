@@ -7,7 +7,7 @@
 html, body, #root {
   height: 100%;
   width: 100%;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   color: #222;
 }
 
