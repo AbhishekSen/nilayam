@@ -11,6 +11,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.106.1",
     "@types/react-plotly.js": "^2.6.4",
     "leaflet": "^1.9.4",
     "plotly.js-dist-min": "^3.5.1",

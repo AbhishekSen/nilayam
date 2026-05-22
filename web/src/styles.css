@@ -311,6 +311,215 @@ html, body, #root {
   color: #fff;
 }
 
+.top-nav-user {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.top-nav-email {
+  color: #cbd5e1;
+}
+
+.top-nav-signout {
+  background: transparent;
+  border: 1px solid #4b5563;
+  color: #cbd5e1;
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: inherit;
+}
+
+.top-nav-signout:hover {
+  background: #374151;
+  color: #fff;
+}
+
+.tier-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.tier-badge-free {
+  background: #4b5563;
+  color: #fff;
+}
+
+.tier-badge-paid {
+  background: #16a34a;
+  color: #fff;
+}
+
+/* --- Auth pages --- */
+
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: #f8fafc;
+  padding: 24px;
+}
+
+.auth-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 32px 36px;
+  max-width: 360px;
+  width: 100%;
+  text-align: center;
+}
+
+.auth-card h1 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.auth-card p {
+  color: #475569;
+  font-size: 13px;
+  margin-bottom: 20px;
+}
+
+.auth-google-btn {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  background: #2563eb;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-family: inherit;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.auth-google-btn:hover {
+  background: #1d4ed8;
+}
+
+.auth-fineprint {
+  font-size: 11px;
+  color: #94a3b8;
+}
+
+.protected-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #475569;
+  font-size: 13px;
+}
+
+/* --- Billing page --- */
+
+.billing-page {
+  padding: 32px;
+  max-width: 720px;
+  margin: 0 auto;
+  overflow: auto;
+  height: 100%;
+}
+
+.billing-page h1 {
+  font-size: 22px;
+  margin-bottom: 16px;
+}
+
+.billing-card {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 24px;
+}
+
+.billing-card h2 {
+  font-size: 15px;
+  margin-bottom: 12px;
+  color: #475569;
+}
+
+.billing-tier {
+  margin-bottom: 16px;
+}
+
+.billing-card p {
+  font-size: 13px;
+  color: #334155;
+  margin-bottom: 16px;
+}
+
+.billing-primary-btn,
+.billing-secondary-btn {
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.billing-primary-btn {
+  background: #16a34a;
+  color: #fff;
+  border: none;
+}
+
+.billing-primary-btn:hover:not(:disabled) {
+  background: #15803d;
+}
+
+.billing-secondary-btn {
+  background: white;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.billing-secondary-btn:hover:not(:disabled) {
+  background: #eff6ff;
+}
+
+.billing-primary-btn:disabled,
+.billing-secondary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.billing-banner {
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.billing-banner-success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.billing-banner-info {
+  background: #e0f2fe;
+  color: #075985;
+  border: 1px solid #bae6fd;
+}
+
+.billing-error {
+  color: #b91c1c !important;
+  margin-top: 12px !important;
+}
+
 /* --- Dashboard layout (analytics pages) --- */
 .dashboard-page {
   height: 100%;

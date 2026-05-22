@@ -6,7 +6,7 @@ import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from api.app.routers import analytics, chat, properties
+from api.app.routers import analytics, billing, chat, me, properties
 
 # Attach a stderr handler to propsoch.* loggers so chat request lines surface
 # alongside uvicorn's access logs.
@@ -45,6 +45,8 @@ def health() -> dict[str, str]:
     return {"status": "ok"}
 
 
+app.include_router(me.router)
 app.include_router(properties.router)
 app.include_router(analytics.router)
 app.include_router(chat.router)
+app.include_router(billing.router)

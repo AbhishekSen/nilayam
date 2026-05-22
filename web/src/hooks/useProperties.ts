@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { fetchProperties } from '../lib/api';
+import { supabase } from '../lib/supabase';
 import { validateCoordinates } from '../utils/validation';
 import type { ValidatedProperty } from '../types/api';
 
@@ -17,25 +18,42 @@ export function useProperties(): UsePropertiesResult {
   useEffect(() => {
     let cancelled = false;
 
-    fetchProperties()
-      .then((rows) => {
+    const load = async () => {
+      try {
+        const { data: sessionData } = await supabase.auth.getSession();
+        if (!sessionData.session) {
+          // Not logged in yet — leave loading=true; we'll re-fire on auth change.
+          return;
+        }
+        const rows = await fetchProperties();
+        if (cancelled) return;
         const validated = rows
           .map(validateCoordinates)
           .filter((r): r is ValidatedProperty => r !== null);
-        if (!cancelled) {
-          setData(validated);
-          setLoading(false);
-        }
-      })
-      .catch((err: Error) => {
-        if (!cancelled) {
-          setError(err.message);
-          setLoading(false);
-        }
-      });
+        setData(validated);
+        setLoading(false);
+      } catch (err) {
+        if (cancelled) return;
+        setError(err instanceof Error ? err.message : String(err));
+        setLoading(false);
+      }
+    };
+
+    void load();
+    const { data: sub } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session) {
+        void load();
+      } else if (event === 'SIGNED_OUT') {
+        if (cancelled) return;
+        setData([]);
+        setLoading(true);
+        setError(null);
+      }
+    });
 
     return () => {
       cancelled = true;
+      sub.subscription.unsubscribe();
     };
   }, []);
 

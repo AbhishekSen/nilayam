@@ -15,10 +15,12 @@ import logging
 import time
 from typing import AsyncIterator, Optional
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field
 
+from api.app.auth import CurrentUser, get_current_user
+from api.app.services import usage
 from api.app.services.chat_agent import stream as agent_stream
 from api.app.services.rate_limit import get_limiter
 
@@ -36,7 +38,7 @@ def _format_sse(event: str, data: dict) -> str:
     return f"event: {event}\ndata: {json.dumps(data, ensure_ascii=False)}\n\n"
 
 
-async def _sse_generator(req: ChatRequest, ip: str) -> AsyncIterator[str]:
+async def _sse_generator(req: ChatRequest, ip: str, user: CurrentUser) -> AsyncIterator[str]:
     started = time.monotonic()
     text_chars = 0
     image_count = 0
@@ -59,8 +61,14 @@ async def _sse_generator(req: ChatRequest, ip: str) -> AsyncIterator[str]:
         error_msg = str(exc)
         yield _format_sse("error", {"message": error_msg})
     finally:
+        if error_msg is None:
+            try:
+                usage.record_chat(user.id)
+            except Exception:  # noqa: BLE001
+                logger.exception("failed to record chat usage for user=%s", user.id)
         logger.info(
-            "chat ip=%s ms=%d chars=%d images=%d tools=%d error=%r msg=%r",
+            "chat user=%s ip=%s ms=%d chars=%d images=%d tools=%d error=%r msg=%r",
+            user.id,
             ip,
             int((time.monotonic() - started) * 1000),
             text_chars,
@@ -72,13 +80,29 @@ async def _sse_generator(req: ChatRequest, ip: str) -> AsyncIterator[str]:
 
 
 @router.post("/chat")
-async def chat(req: ChatRequest, request: Request) -> StreamingResponse:
+async def chat(
+    req: ChatRequest,
+    request: Request,
+    user: CurrentUser = Depends(get_current_user),
+) -> StreamingResponse:
     ip = request.client.host if request.client else "unknown"
     allowed, msg = get_limiter().check(ip)
     if not allowed:
         raise HTTPException(status_code=429, detail=msg)
+
+    if user.effective_tier == "free":
+        used = usage.count_recent_chats(user.id)
+        if used >= usage.FREE_TIER_LIMIT:
+            raise HTTPException(
+                status_code=429,
+                detail=(
+                    f"Free tier limit: {usage.FREE_TIER_LIMIT} chats per 7 days. "
+                    "Upgrade to continue."
+                ),
+            )
+
     return StreamingResponse(
-        _sse_generator(req, ip),
+        _sse_generator(req, ip, user),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache",

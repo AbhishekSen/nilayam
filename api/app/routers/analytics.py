@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from typing import Optional
 
-from fastapi import APIRouter, Query
+from fastapi import APIRouter, Depends, Query
 
+from api.app.auth import CurrentUser, get_current_user
 from api.app.models import (
     AmenityPremiumResponse,
     PriceVsMarketResponse,
@@ -20,6 +21,7 @@ def price_vs_market_route(
     developerGrade: Optional[list[str]] = Query(default=None),
     projectStatus: Optional[list[str]] = Query(default=None),
     showOnlyUnderpriced: bool = Query(default=False),
+    user: CurrentUser = Depends(get_current_user),
 ) -> PriceVsMarketResponse:
     return price_vs_market.compute(
         cities=city,
@@ -39,6 +41,7 @@ def undervalued_route(
     wDiscount: float = Query(default=0.40, ge=0.0, le=1.0),
     wPropscore: float = Query(default=0.35, ge=0.0, le=1.0),
     wGrade: float = Query(default=0.25, ge=0.0, le=1.0),
+    user: CurrentUser = Depends(get_current_user),
 ) -> UndervaluedResponse:
     return undervalued.compute(
         min_discount=minDiscount,
@@ -59,6 +62,7 @@ def amenity_premium_route(
     developerGrade: Optional[list[str]] = Query(default=None),
     projectStatus: Optional[list[str]] = Query(default=None),
     drillAmenity: Optional[str] = Query(default=None),
+    user: CurrentUser = Depends(get_current_user),
 ) -> AmenityPremiumResponse:
     return amenity_premium.compute(
         alpha=alpha,

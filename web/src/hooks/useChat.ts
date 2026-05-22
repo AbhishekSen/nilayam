@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react';
+import { supabase } from '../lib/supabase';
 
 export type ChatImage = { mime: string; b64: string };
 
@@ -11,6 +12,7 @@ export type ChatMessage =
       tools: string[];
       streaming: boolean;
       error?: string;
+      quotaHit?: boolean;
     };
 
 type ServerEvent =
@@ -57,9 +59,14 @@ export function useChat() {
       });
 
     try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
+      const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
       const resp = await fetch(`${API_BASE}/api/chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({
           message: trimmed,
           previous_response_id: previousResponseId.current,
@@ -67,10 +74,18 @@ export function useChat() {
         signal: controller.signal,
       });
 
+      if (resp.status === 401) {
+        await supabase.auth.signOut();
+        if (typeof window !== 'undefined') window.location.assign('/login');
+        return;
+      }
+
       if (!resp.ok || !resp.body) {
-        const detail = await resp.text().catch(() => `HTTP ${resp.status}`);
+        const detail = await extractError(resp);
         patchAssistant((msg) =>
-          msg.role === 'assistant' ? { ...msg, streaming: false, error: detail } : msg,
+          msg.role === 'assistant'
+            ? { ...msg, streaming: false, error: detail, quotaHit: resp.status === 429 }
+            : msg,
         );
         return;
       }
@@ -124,6 +139,20 @@ export function useChat() {
   }, [cancel]);
 
   return { messages, busy, send, cancel, reset };
+}
+
+async function extractError(resp: Response): Promise<string> {
+  try {
+    const ct = resp.headers.get('content-type') ?? '';
+    if (ct.includes('application/json')) {
+      const body = await resp.json();
+      if (typeof body?.detail === 'string') return body.detail;
+    }
+    const txt = await resp.text();
+    return txt || `HTTP ${resp.status}`;
+  } catch {
+    return `HTTP ${resp.status}`;
+  }
 }
 
 function parseSseEvent(raw: string): ServerEvent | null {

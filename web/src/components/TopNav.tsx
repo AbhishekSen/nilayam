@@ -1,4 +1,5 @@
 import { NavLink } from 'react-router-dom';
+import { useAuth } from '../context/authContext';
 
 const LINKS: { to: string; label: string }[] = [
   { to: '/', label: 'Map' },
@@ -9,6 +10,9 @@ const LINKS: { to: string; label: string }[] = [
 ];
 
 export default function TopNav() {
+  const { session, me, signOut } = useAuth();
+  const tier = me?.tier ?? 'free';
+
   return (
     <nav className="top-nav">
       <span className="top-nav-brand">Propsoch</span>
@@ -27,6 +31,17 @@ export default function TopNav() {
           </li>
         ))}
       </ul>
+      {session && (
+        <div className="top-nav-user">
+          <NavLink to="/billing" className="top-nav-link">
+            <span className={`tier-badge tier-badge-${tier}`}>{tier}</span>
+          </NavLink>
+          <span className="top-nav-email">{me?.email ?? session.user.email}</span>
+          <button type="button" className="top-nav-signout" onClick={signOut}>
+            Sign out
+          </button>
+        </div>
+      )}
     </nav>
   );
 }
